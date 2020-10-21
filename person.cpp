@@ -6,7 +6,7 @@ using std::cout;
 using std::endl;
 
 Person::Person(char *name, Person* father, Person* mother){
-    this->name = new char[strlen(name)];
+    this->name = new char[strlen(name) + 1];
     strcpy(this->name, name);
     this->father = father;
     this->mother = mother;
@@ -16,7 +16,8 @@ Person::Person(char *name, Person* father, Person* mother){
 }
 
 Person::~Person(){
-    delete children;
+	delete[] this->name;
+	delete[] children;
 }
 
 void Person::addChild(Person *newChild){
@@ -52,12 +53,13 @@ void Person::printLineage(char dir, int level){
             father->printLineage(dir, level + 1);
         }
     }
+	delete[] temp;
 }
 
 /* helper function to compute the lineage
-* if level = 0 then returns the empty string
-* if level >= 1 then returns ("great ")^(level - 1) + "grand "
-*/
+ * * if level = 0 then returns the empty string
+ * * if level >= 1 then returns ("great ")^(level - 1) + "grand "
+ * */
 char* Person::compute_relation(int level){
     if(level == 0) return strcpy(new char[1], "");
 
@@ -66,17 +68,20 @@ char* Person::compute_relation(int level){
     for(int i = 2; i <= level; i++){
         char *temp2 = new char[strlen("great ") + strlen(temp) + 1];
         strcat(strcpy(temp2, "great "), temp);
-        temp = temp2;
+        delete[] temp;
+		temp = temp2;
     }
     return temp;
 }
 
 /* non-member function which doubles the size of t
- * NOTE: t's type will be a pointer to an array of pointers
- */
+ *  * NOTE: t's type will be a pointer to an array of pointers
+ *   */
 void expand(Person ***t, int *MAX){
-  Person **temp = new Person*[2 * *MAX];
-  memcpy(temp, *t, *MAX * sizeof(**t));
-  *MAX *= 2;
-  *t = temp;
+	Person **temp = new Person*[2 * *MAX];
+	memcpy(temp, *t, *MAX * sizeof(**t));
+	delete[] *t;
+	*MAX *= 2;
+	*t = temp;
 }
+
